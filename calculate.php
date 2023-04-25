@@ -3,7 +3,7 @@
     if(isset($_SESSION["result"])) {
         $_SESSION["result"] = $_SESSION["result"];
     } else {
-        $_SESSION["result"] = "0";
+        $_SESSION["result"] = 0;
     }
 ?>
 
@@ -11,8 +11,12 @@
     <head>
         <title>Calculator</title>
         <style>
+            body {
+                background-color:beige;
+            }
+
             table {
-                width:66%;
+                width:50%;
                 font-size:50px;
             }
 
@@ -24,11 +28,15 @@
                 width:100%;
                 height:100px;
                 font-size:30px;
+                background-color:#bfbfbf;
+                border-color:#737373;
             }
 
             .label {
                 height:100px;
-
+                background-color:#bfbfbf;
+                border-style:solid;
+                border-color:#737373;
             }
         </style>
     </head>
@@ -37,43 +45,43 @@
         <?php
             if($_SESSION["result"] == 0) {
                 if(isset($_POST["1"])) {
-                    $_SESSION["result"] = "1";
+                    $_SESSION["result"] = 1;
                 } else if(isset($_POST["2"])) {
-                    $_SESSION["result"] = "2";
+                    $_SESSION["result"] = 2;
                 } else if(isset($_POST["3"])) {
-                    $_SESSION["result"] = "3";
+                    $_SESSION["result"] = 3;
                 } else if(isset($_POST["4"])) {
-                    $_SESSION["result"] = "4";
+                    $_SESSION["result"] = 4;
                 } else if(isset($_POST["5"])) {
-                    $_SESSION["result"] = "5";
+                    $_SESSION["result"] = 5;
                 } else if(isset($_POST["6"])) {
-                    $_SESSION["result"] = "6";
+                    $_SESSION["result"] = 6;
                 } else if(isset($_POST["7"])) {
-                    $_SESSION["result"] = "7";
+                    $_SESSION["result"] = 7;
                 } else if(isset($_POST["8"])) {
-                    $_SESSION["result"] = "8";
+                    $_SESSION["result"] = 8;
                 } else if(isset($_POST["9"])) {
-                    $_SESSION["result"] = "9";
+                    $_SESSION["result"] = 9;
                 }
             } else {
                 if(isset($_POST["1"])) {
-                    $_SESSION["result"] .= "1";
+                    $_SESSION["result"] .= 1;
                 } else if(isset($_POST["2"])) {
-                    $_SESSION["result"] .= "2";
+                    $_SESSION["result"] .= 2;
                 } else if(isset($_POST["3"])) {
-                    $_SESSION["result"] .= "3";
+                    $_SESSION["result"] .= 3;
                 } else if(isset($_POST["4"])) {
-                    $_SESSION["result"] .= "4";
+                    $_SESSION["result"] .= 4;
                 } else if(isset($_POST["5"])) {
-                    $_SESSION["result"] .= "5";
+                    $_SESSION["result"] .= 5;
                 } else if(isset($_POST["6"])) {
-                    $_SESSION["result"] .= "6";
+                    $_SESSION["result"] .= 6;
                 } else if(isset($_POST["7"])) {
-                    $_SESSION["result"] .= "7";
+                    $_SESSION["result"] .= 7;
                 } else if(isset($_POST["8"])) {
-                    $_SESSION["result"] .= "8";
+                    $_SESSION["result"] .= 8;
                 } else if(isset($_POST["9"])) {
-                    $_SESSION["result"] .= "9";
+                    $_SESSION["result"] .= 9;
                 }
             }
 
@@ -86,7 +94,35 @@
             } else if(isset($_POST["/"])) {
                 $_SESSION["result"] = $_SESSION["result"] .=  "/";
             } else if(isset($_POST["clear"])) {
-                $_SESSION["result"] = "0";
+                $_SESSION["result"] = 0;
+            } else if(isset($_POST["="])) {
+                $array = str_split($_SESSION["result"]);
+
+                for($i = 0; $i < strlen($_SESSION["result"]); $i++) {
+                    if($array[$i] == "+") {
+                        $first_half = substr($_SESSION["result"], 0, $i);
+                        $second_half = substr($_SESSION["result"], $i, strlen($_SESSION["result"]));
+                        $_SESSION["result"] = intval($first_half) + intval($second_half);
+                    }
+
+                    if($array[$i] == "-") {
+                        $first_half = substr($_SESSION["result"], 0, $i);
+                        $second_half = substr($_SESSION["result"], $i, strlen($_SESSION["result"]));
+                        $_SESSION["result"] = intval($first_half) - intval($second_half);
+                    }
+
+                    if($array[$i] == "*") {
+                        $first_half = substr($_SESSION["result"], 0, $i);
+                        $second_half = substr($_SESSION["result"], $i, strlen($_SESSION["result"]));
+                        $_SESSION["result"] = intval($first_half) * intval($second_half);
+                    }
+
+                    if($array[$i] == "/") {
+                        $first_half = substr($_SESSION["result"], 0, $i);
+                        $second_half = substr($_SESSION["result"], $i, strlen($_SESSION["result"]));
+                        $_SESSION["result"] = intval($first_half) / intval($second_half);
+                    }
+                }
             }
         ?>
 
@@ -123,7 +159,7 @@
                     </tr>
 
                     <tr>
-                        <td><button type="submit" name="clear" id="clear">clr</button></td>
+                        <td><button type="submit" name="clear" id="clear">C</button></td>
                         <td><button type="submit" name="0" id="0">0</button></td>
                         <td><button type="submit" name="/" id="/">/</button></td>
                         <td><button type="submit" name="=" id="=">=</button></td>
