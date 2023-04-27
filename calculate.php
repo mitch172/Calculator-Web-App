@@ -101,6 +101,8 @@
                     $_SESSION["result"] .= 8;
                 } else if(isset($_POST["9"])) {
                     $_SESSION["result"] .= 9;
+                } else if(isset($_POST["0"])) {
+                    $_SESSION["result"] .= 0;
                 } else if(isset($_POST["+"])) {
                     $_SESSION["result"] = $_SESSION["result"] .= "+";
                 } else if(isset($_POST["-"])) {
@@ -119,19 +121,19 @@
                 for($i = 0; $i < strlen($_SESSION["result"]); $i++) {
                     if($array[$i] == "+") {
                         $first_half = substr($_SESSION["result"], 0, $i);
-                        $second_half = substr($_SESSION["result"], $i, strlen($_SESSION["result"]));
+                        $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
                         $_SESSION["result"] = intval($first_half) + intval($second_half);
                     } else if($array[$i] == "-") {
                         $first_half = substr($_SESSION["result"], 0, $i);
-                        $second_half = substr($_SESSION["result"], $i, strlen($_SESSION["result"]));
-                        $_SESSION["result"] = intval($first_half) - intval($second_half);
+                        $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
+                        $_SESSION["result"] = (double)$first_half - (double)$second_half;
                     } else if($array[$i] == "*") {
                         $first_half = substr($_SESSION["result"], 0, $i);
-                        $second_half = substr($_SESSION["result"], $i, strlen($_SESSION["result"]));
+                        $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
                         $_SESSION["result"] = intval($first_half) * intval($second_half);
                     } else if($array[$i] == "/") {
                         $first_half = substr($_SESSION["result"], 0, $i);
-                        $second_half = substr($_SESSION["result"], $i, strlen($_SESSION["result"]));
+                        $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
                         $_SESSION["result"] = intval($first_half) / intval($second_half);
                     }
                 }
