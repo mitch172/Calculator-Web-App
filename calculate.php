@@ -120,6 +120,8 @@
                     $_SESSION["result"] = substr($_SESSION["result"], 0, strlen($_SESSION["result"]) - 1);
                 } else if(isset($_POST["dec"])) {
                     $_SESSION["result"] = $_SESSION["result"] .=  ".";
+                } else if(isset($_POST["inverse"])) {
+                    $_SESSION["result"] = 1 / $_SESSION["result"];
                 }
             }
             
@@ -195,7 +197,7 @@
                     </tr>
 
                     <tr>
-                        <td><button type="submit" name="" id=""></button></td>
+                        <td><button type="submit" name="inverse" id="inverse">1/x</button></td>
                         <td><button type="submit" name="clear" id="clear">C</button></td>
                         <td><button type="submit" name="0" id="0">0</button></td>
                         <td><button type="submit" name="/" id="/">/</button></td>
