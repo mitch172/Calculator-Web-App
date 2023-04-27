@@ -110,6 +110,8 @@
                     $_SESSION["result"] = "cos(" . $_SESSION["result"] . ")";
                 } else if(isset($_POST["tan"])) {
                     $_SESSION["result"] = "tan(" . $_SESSION["result"] . ")";
+                } else if(isset($_POST["sqrt"])) {
+                    $_SESSION["result"] = "sqrt(" . $_SESSION["result"] . ")";
                 }
 
             // Otherwise, place the new input next to the current string
@@ -153,11 +155,13 @@
                     $_SESSION["result"] = 1 / $_SESSION["result"];
                     array_push($_SESSION["history_results"], $_SESSION["result"]);
                 } else if(isset($_POST["sin"])) {
-                    $_SESSION["result"] = "sin(" . $_SESSION["result"] . ")";
+                    $_SESSION["result"] = "sin(" . $_SESSION["result"];
                 } else if(isset($_POST["cos"])) {
-                    $_SESSION["result"] = "cos(" . $_SESSION["result"] . ")";
+                    $_SESSION["result"] = "cos(" . $_SESSION["result"];
                 } else if(isset($_POST["tan"])) {
-                    $_SESSION["result"] = "tan(" . $_SESSION["result"] . ")";
+                    $_SESSION["result"] = "tan(" . $_SESSION["result"];
+                } else if(isset($_POST["sqrt"])) {
+                    $_SESSION["result"] = "sqrt(" . $_SESSION["result"];
                 }
             }
             
@@ -213,20 +217,34 @@
                             $_SESSION["result"] = "Error: no second value";
                         }
                     } else if(str_contains($_SESSION["result"], "sin")) {
-                        if(is_numeric(substr($_SESSION["result"], 4, strlen($_SESSION["result"]) - 1))) {
-                            $_SESSION["result"] = sin(substr($_SESSION["result"], 4, strlen($_SESSION["result"]) - 1));
+                        $val = intval(substr($_SESSION["result"], 4));
+                        if(is_numeric($val)) {
+                            $_SESSION["result"] = sin($val);
                         } else {
                             $_SESSION["result"] = "Error: no value input";
                         }
                     } else if(str_contains($_SESSION["result"], "cos")) {
-                        if(is_numeric(substr($_SESSION["result"], 4, strlen($_SESSION["result"]) - 1))) {
-                            $_SESSION["result"] = cos(substr($_SESSION["result"], 4, strlen($_SESSION["result"]) - 1));
+                        $val = intval(substr($_SESSION["result"], 4));
+                        if(is_numeric($val)) {
+                            $_SESSION["result"] = cos($val);
                         } else {
                             $_SESSION["result"] = "Error: no value input";
                         }
                     } else if(str_contains($_SESSION["result"], "tan")) {
-                        if(is_numeric(substr($_SESSION["result"], 4, strlen($_SESSION["result"]) - 1))) {
-                            $_SESSION["result"] = tan(substr($_SESSION["result"], 4, strlen($_SESSION["result"]) - 1));
+                        $val = intval(substr($_SESSION["result"], 4));
+                        if(is_numeric($val)) {
+                            $_SESSION["result"] = tan($val);
+                        } else {
+                            $_SESSION["result"] = "Error: no value input";
+                        }
+                    } else if(str_contains($_SESSION["result"], "sqrt")) {
+                        $val = intval(substr($_SESSION["result"], 5));
+                        if(is_numeric($val)) {
+                            if($val >= 0) {
+                                $_SESSION["result"] = sqrt($val);
+                            } else {
+                                $_SESSION["result"] = "Error: cannot find sqrt of negative";
+                            }
                         } else {
                             $_SESSION["result"] = "Error: no value input";
                         }
@@ -252,21 +270,21 @@
                     </tr>
 
                     <tr>
-                        <td><button type="submit" name="back" id="back"><-</button></td>
+                        <td><button type="submit" name="dec" id="dec">.</button></td>
                         <td><button type="submit" name="7" id="7">7</button></td>
                         <td><button type="submit" name="8" id="8">8</button></td>
                         <td><button type="submit" name="9" id="9">9</button></td>
-                        <td><button type="submit" name="*" id="*">*</button></td>
                         <td><button type="submit" name="sin" id="sin">sin</button></td>
+                        <td><button type="submit" name="*" id="*">*</button></td>
                     </tr>
                     
                     <tr>
-                        <td><button type="submit" name="dec" id="dec">.</button></td>
+                        <td><button type="submit" name="sqrt" id="sqrt">sqrt</button></td>
                         <td><button type="submit" name="4" id="4">4</button></td>
                         <td><button type="submit" name="5" id="5">5</button></td>
                         <td><button type="submit" name="6" id="6">6</button></td>
-                        <td><button type="submit" name="-" id="-">-</button></td>
                         <td><button type="submit" name="cos" id="cos">cos</button></td>
+                        <td><button type="submit" name="-" id="-">-</button></td>
                     </tr>
 
                     <tr>
@@ -274,17 +292,17 @@
                         <td><button type="submit" name="1" id="1">1</button></td>
                         <td><button type="submit" name="2" id="2">2</button></td>
                         <td><button type="submit" name="3" id="3">3</button></td>
-                        <td><button type="submit" name="+" id="+">+</button></td>
                         <td><button type="submit" name="tan" id="tan">tan</button></td>
+                        <td><button type="submit" name="+" id="+">+</button></td>
                     </tr>
 
                     <tr>
                         <td><button type="submit" name="inverse" id="inverse">1/x</button></td>
                         <td><button type="submit" name="clear" id="clear">C</button></td>
                         <td><button type="submit" name="0" id="0">0</button></td>
+                        <td><button type="submit" name="back" id="back"><-</button></td>
                         <td><button type="submit" name="=" id="=">=</button></td>
                         <td><button type="submit" name="/" id="/">/</button></td>
-                        <td><button type="submit" name="clear history" id="clear history">clr his</button></td>
                     </tr>
 
                     <tr>
