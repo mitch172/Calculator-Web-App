@@ -28,7 +28,7 @@
             }
 
             button {
-                width:100%;
+                width:150px;
                 height:100px;
                 font-size:30px;
                 background-color:#bfbfbf;
@@ -47,6 +47,7 @@
     <body>
         <?php
             // Checks to see which button is pressed
+            // If button is clear, clear running result to 0
             if(isset($_POST["clear"])) {
                 $_SESSION["result"] = 0;
             }
@@ -79,6 +80,8 @@
                     $_SESSION["result"] = $_SESSION["result"] .= "*";
                 } else if(isset($_POST["/"])) {
                     $_SESSION["result"] = $_SESSION["result"] .=  "/";
+                } else if(isset($_POST["dec"])) {
+                    $_SESSION["result"] = $_SESSION["result"] .= ".";
                 }
 
             // Otherwise, place the new input next to the current string
@@ -111,10 +114,16 @@
                     $_SESSION["result"] = $_SESSION["result"] .= "*";
                 } else if(isset($_POST["/"])) {
                     $_SESSION["result"] = $_SESSION["result"] .=  "/";
+                } else if(isset($_POST["^"])) {
+                    $_SESSION["result"] = $_SESSION["result"] .=  "^";
+                } else if(isset($_POST["back"])) {
+                    $_SESSION["result"] = substr($_SESSION["result"], 0, strlen($_SESSION["result"]) - 1);
+                } else if(isset($_POST["dec"])) {
+                    $_SESSION["result"] = $_SESSION["result"] .=  ".";
                 }
             }
             
-            // If button pressed is equal
+            // If button pressed is "="
             if(isset($_POST["="])) {
                 $array = str_split($_SESSION["result"]);
 
@@ -139,6 +148,10 @@
                         } else {
                             $_SESSION["result"] = $first_half / $second_half;
                         }
+                    } else if($array[$i] == "^") {
+                        $first_half = substr($_SESSION["result"], 0, $i);
+                        $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
+                        $_SESSION["result"] = pow($first_half, $second_half);
                     }
                 }
             }
@@ -150,7 +163,7 @@
             <form action="calculate.php" method="post">
                 <table>
                     <tr>
-                        <td colspan="4" class="label">
+                        <td colspan="5" class="label">
                             <?php
                                 echo $_SESSION["result"];
                             ?>
@@ -158,6 +171,7 @@
                     </tr>
 
                     <tr>
+                        <td><button type="submit" name="back" id="back"><-</button></td>
                         <td><button type="submit" name="7" id="7">7</button></td>
                         <td><button type="submit" name="8" id="8">8</button></td>
                         <td><button type="submit" name="9" id="9">9</button></td>
@@ -165,6 +179,7 @@
                     </tr>
                     
                     <tr>
+                        <td><button type="submit" name="dec" id="dec">.</button></td>
                         <td><button type="submit" name="4" id="4">4</button></td>
                         <td><button type="submit" name="5" id="5">5</button></td>
                         <td><button type="submit" name="6" id="6">6</button></td>
@@ -172,6 +187,7 @@
                     </tr>
 
                     <tr>
+                        <td><button type="submit" name="^" id="^">^</button></td>
                         <td><button type="submit" name="1" id="1">1</button></td>
                         <td><button type="submit" name="2" id="2">2</button></td>
                         <td><button type="submit" name="3" id="3">3</button></td>
@@ -179,6 +195,7 @@
                     </tr>
 
                     <tr>
+                        <td><button type="submit" name="" id=""></button></td>
                         <td><button type="submit" name="clear" id="clear">C</button></td>
                         <td><button type="submit" name="0" id="0">0</button></td>
                         <td><button type="submit" name="/" id="/">/</button></td>
