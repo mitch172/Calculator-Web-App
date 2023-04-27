@@ -10,8 +10,13 @@
     }
 
     // Array used for storing history of calculations
-    $_SESSION["history"] = [];
-    $_SESSION["history_results"] = [];
+    if(isset($_SESSION["history"])) {
+        $_SESSION["history"] = $_SESSION["history"];
+        $_SESSION["history_results"] = $_SESSION["history_results"];
+    } else {
+        $_SESSION["history"] = array();
+        $_SESSION["history_results"] = array();
+    }
 ?>
 
 <html>   
@@ -60,10 +65,6 @@
             if(isset($_POST["clear"])) {
                 $_SESSION["result"] = 0;
             }
-            // // Check to see if history button pressed
-            // } else if(isset($_POST["history"])) {
-            //     header("Location: history.php");
-            // }
 
             // If the current value is 0 replace the 0 with the next input
             if($_SESSION["result"] == 0) {
@@ -150,27 +151,45 @@
                     if($array[$i] == "+") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
-                        $_SESSION["result"] = $first_half + $second_half;
+                        if(is_numeric($second_half)) {
+                            $_SESSION["result"] = $first_half + $second_half;
+                        } else {
+                            $_SESSION["result"] = "Error: no second value";
+                        }
                     } else if($array[$i] == "-") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
-                        $_SESSION["result"] = $first_half - $second_half;
+                        if(is_numeric($second_half)) {
+                            $_SESSION["result"] = $first_half - $second_half;
+                        } else {
+                            $_SESSION["result"] = "Error: no second value";
+                        }
                     } else if($array[$i] == "*") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
-                        $_SESSION["result"] = $first_half * $second_half;
+                        if(is_numeric($second_half)) {
+                            $_SESSION["result"] = $first_half * $second_half;
+                        } else {
+                            $_SESSION["result"] = "Error: no second value";
+                        }
                     } else if($array[$i] == "/") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
                         if($second_half == 0) {
                             $_SESSION["result"] = "Error: divide by 0";
+                        } else if(!is_numeric($second_half)) {
+                            $_SESSION["result"] = "Error: no second value";
                         } else {
                             $_SESSION["result"] = $first_half / $second_half;
                         }
                     } else if($array[$i] == "^") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
-                        $_SESSION["result"] = pow($first_half, $second_half);
+                        if(isset($second_half)) {
+                            $_SESSION["result"] = pow($first_half, $second_half);
+                        } else {
+                            $_SESSION["result"] = "Error: no second value";
+                        }
                     }
                 }
 
