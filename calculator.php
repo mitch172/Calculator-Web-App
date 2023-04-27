@@ -99,13 +99,13 @@
                 } else if(isset($_POST["^"])) {
                     $_SESSION["result"] = $_SESSION["result"] .=  "^";
                 } else if(isset($_POST["sin"])) {
-                    $_SESSION["result"] = "sin(" . $_SESSION["result"] . ")";
+                    $_SESSION["result"] = "sin(" . $_SESSION["result"];
                 } else if(isset($_POST["cos"])) {
-                    $_SESSION["result"] = "cos(" . $_SESSION["result"] . ")";
+                    $_SESSION["result"] = "cos(" . $_SESSION["result"];
                 } else if(isset($_POST["tan"])) {
-                    $_SESSION["result"] = "tan(" . $_SESSION["result"] . ")";
+                    $_SESSION["result"] = "tan(" . $_SESSION["result"];
                 } else if(isset($_POST["sqrt"])) {
-                    $_SESSION["result"] = "sqrt(" . $_SESSION["result"] . ")";
+                    $_SESSION["result"] = "sqrt(" . $_SESSION["result"];
                 }
 
             // Otherwise, place the new input next to the current string
