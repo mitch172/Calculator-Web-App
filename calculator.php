@@ -156,6 +156,8 @@
                     $_SESSION["result"] = "tan(" . $_SESSION["result"];
                 } else if(isset($_POST["sqrt"])) {
                     $_SESSION["result"] = "sqrt(" . $_SESSION["result"];
+                } else if(isset($_POST["neg"])) {
+                    $_SESSION["result"] = -1 * $_SESSION["result"];
                 }
             }
             
@@ -177,6 +179,14 @@
                             $_SESSION["result"] = "Error: no second value";
                         }
                     } else if($array[$i] == "-" && $array[0] != "-") {
+                        $first_half = substr($_SESSION["result"], 0, $i);
+                        $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
+                        if(is_numeric($second_half)) {
+                            $_SESSION["result"] = $first_half - $second_half;
+                        } else {
+                            $_SESSION["result"] = "Error: no second value";
+                        }
+                    } else if($i != 0 && $array[$i] == "-" && $array[0] == "-" && is_numeric($array[$i - 1])) {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
                         if(is_numeric($second_half)) {
@@ -300,7 +310,8 @@
                     </tr>
 
                     <tr>
-                        <td colspan="6" class="label"><a href="history.php" target="_blank">history</a></td>
+                        <td colspan="5" class="label"><a href="history.php" target="_blank">history</a></td>
+                        <td><button type="submit" name="neg" id="neg">+/-</button></td>
                     </tr>
                 </table>
             </form>
