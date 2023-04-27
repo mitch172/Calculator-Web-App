@@ -126,7 +126,7 @@
                     } else if($array[$i] == "-") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
-                        $_SESSION["result"] = (double)$first_half - (double)$second_half;
+                        $_SESSION["result"] = intval($first_half) - intval($second_half);
                     } else if($array[$i] == "*") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
