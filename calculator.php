@@ -171,12 +171,12 @@
                     if($array[$i] == "+") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
-                        if(is_numeric($second_half)) {
+                        if($second_half != null) {
                             $_SESSION["result"] = $first_half + $second_half;
                         } else {
                             $_SESSION["result"] = "Error: no second value";
                         }
-                    } else if($array[$i] == "-") {
+                    } else if($array[$i] == "-" && $array[0] != "-") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
                         if(is_numeric($second_half)) {
