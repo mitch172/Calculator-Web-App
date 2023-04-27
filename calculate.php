@@ -118,23 +118,27 @@
             if(isset($_POST["="])) {
                 $array = str_split($_SESSION["result"]);
 
-                for($i = 0; $i < strlen($_SESSION["result"]); $i++) {
+                for($i = 0; $i < count($array); $i++) {
                     if($array[$i] == "+") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
-                        $_SESSION["result"] = intval($first_half) + intval($second_half);
+                        $_SESSION["result"] = $first_half + $second_half;
                     } else if($array[$i] == "-") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
-                        $_SESSION["result"] = intval($first_half) - intval($second_half);
+                        $_SESSION["result"] = $first_half - $second_half;
                     } else if($array[$i] == "*") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
-                        $_SESSION["result"] = intval($first_half) * intval($second_half);
+                        $_SESSION["result"] = $first_half * $second_half;
                     } else if($array[$i] == "/") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
-                        $_SESSION["result"] = intval($first_half) / intval($second_half);
+                        if($second_half == 0) {
+                            $_SESSION["result"] = "Error: divide by 0";
+                        } else {
+                            $_SESSION["result"] = $first_half / $second_half;
+                        }
                     }
                 }
             }
