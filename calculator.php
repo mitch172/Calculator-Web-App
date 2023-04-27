@@ -9,6 +9,12 @@
         $_SESSION["result"] = 0;
     }
 
+    // Check if clear history button was clicked
+    if(isset($_POST["clear history"])) {
+        session_unset($_SESSION["history"]);
+        session_unset($_SESSION["history_results"]);
+    }
+
     // Array used for storing history of calculations
     if(isset($_SESSION["history"])) {
         $_SESSION["history"] = $_SESSION["history"];
@@ -96,6 +102,14 @@
                     $_SESSION["result"] = $_SESSION["result"] .=  "/";
                 } else if(isset($_POST["dec"])) {
                     $_SESSION["result"] = $_SESSION["result"] .= ".";
+                } else if(isset($_POST["^"])) {
+                    $_SESSION["result"] = $_SESSION["result"] .=  "^";
+                } else if(isset($_POST["sin"])) {
+                    $_SESSION["result"] = "sin(" . $_SESSION["result"] . ")";
+                } else if(isset($_POST["cos"])) {
+                    $_SESSION["result"] = "cos(" . $_SESSION["result"] . ")";
+                } else if(isset($_POST["tan"])) {
+                    $_SESSION["result"] = "tan(" . $_SESSION["result"] . ")";
                 }
 
             // Otherwise, place the new input next to the current string
@@ -135,7 +149,15 @@
                 } else if(isset($_POST["dec"])) {
                     $_SESSION["result"] = $_SESSION["result"] .=  ".";
                 } else if(isset($_POST["inverse"])) {
+                    array_push($_SESSION["history"], $_SESSION["result"]);
                     $_SESSION["result"] = 1 / $_SESSION["result"];
+                    array_push($_SESSION["history_results"], $_SESSION["result"]);
+                } else if(isset($_POST["sin"])) {
+                    $_SESSION["result"] = "sin(" . $_SESSION["result"] . ")";
+                } else if(isset($_POST["cos"])) {
+                    $_SESSION["result"] = "cos(" . $_SESSION["result"] . ")";
+                } else if(isset($_POST["tan"])) {
+                    $_SESSION["result"] = "tan(" . $_SESSION["result"] . ")";
                 }
             }
             
@@ -185,10 +207,28 @@
                     } else if($array[$i] == "^") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
-                        if(isset($second_half)) {
+                        if(is_numeric($second_half)) {
                             $_SESSION["result"] = pow($first_half, $second_half);
                         } else {
                             $_SESSION["result"] = "Error: no second value";
+                        }
+                    } else if(str_contains($_SESSION["result"], "sin")) {
+                        if(is_numeric(substr($_SESSION["result"], 4, strlen($_SESSION["result"]) - 1))) {
+                            $_SESSION["result"] = sin(substr($_SESSION["result"], 4, strlen($_SESSION["result"]) - 1));
+                        } else {
+                            $_SESSION["result"] = "Error: no value input";
+                        }
+                    } else if(str_contains($_SESSION["result"], "cos")) {
+                        if(is_numeric(substr($_SESSION["result"], 4, strlen($_SESSION["result"]) - 1))) {
+                            $_SESSION["result"] = cos(substr($_SESSION["result"], 4, strlen($_SESSION["result"]) - 1));
+                        } else {
+                            $_SESSION["result"] = "Error: no value input";
+                        }
+                    } else if(str_contains($_SESSION["result"], "tan")) {
+                        if(is_numeric(substr($_SESSION["result"], 4, strlen($_SESSION["result"]) - 1))) {
+                            $_SESSION["result"] = tan(substr($_SESSION["result"], 4, strlen($_SESSION["result"]) - 1));
+                        } else {
+                            $_SESSION["result"] = "Error: no value input";
                         }
                     }
                 }
@@ -204,7 +244,7 @@
             <form action="calculator.php" method="post">
                 <table>
                     <tr>
-                        <td colspan="5" class="label">
+                        <td colspan="6" class="label">
                             <?php
                                 echo $_SESSION["result"];
                             ?>
@@ -217,6 +257,7 @@
                         <td><button type="submit" name="8" id="8">8</button></td>
                         <td><button type="submit" name="9" id="9">9</button></td>
                         <td><button type="submit" name="*" id="*">*</button></td>
+                        <td><button type="submit" name="sin" id="sin">sin</button></td>
                     </tr>
                     
                     <tr>
@@ -225,6 +266,7 @@
                         <td><button type="submit" name="5" id="5">5</button></td>
                         <td><button type="submit" name="6" id="6">6</button></td>
                         <td><button type="submit" name="-" id="-">-</button></td>
+                        <td><button type="submit" name="cos" id="cos">cos</button></td>
                     </tr>
 
                     <tr>
@@ -233,18 +275,20 @@
                         <td><button type="submit" name="2" id="2">2</button></td>
                         <td><button type="submit" name="3" id="3">3</button></td>
                         <td><button type="submit" name="+" id="+">+</button></td>
+                        <td><button type="submit" name="tan" id="tan">tan</button></td>
                     </tr>
 
                     <tr>
                         <td><button type="submit" name="inverse" id="inverse">1/x</button></td>
                         <td><button type="submit" name="clear" id="clear">C</button></td>
                         <td><button type="submit" name="0" id="0">0</button></td>
-                        <td><button type="submit" name="/" id="/">/</button></td>
                         <td><button type="submit" name="=" id="=">=</button></td>
+                        <td><button type="submit" name="/" id="/">/</button></td>
+                        <td><button type="submit" name="clear history" id="clear history">clr his</button></td>
                     </tr>
 
                     <tr>
-                        <td colspan="5"><button><a href="history.php" target="_blank">history</a></button></td>
+                        <td colspan="6" class="label"><a href="history.php" target="_blank">history</a></td>
                     </tr>
                 </table>
             </form>
