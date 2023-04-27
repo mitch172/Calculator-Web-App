@@ -8,13 +8,7 @@
     } else {
         $_SESSION["result"] = 0;
     }
-
-    // Check if clear history button was clicked
-    if(isset($_POST["clear history"])) {
-        session_unset($_SESSION["history"]);
-        session_unset($_SESSION["history_results"]);
-    }
-
+    
     // Array used for storing history of calculations
     if(isset($_SESSION["history"])) {
         $_SESSION["history"] = $_SESSION["history"];
