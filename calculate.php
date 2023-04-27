@@ -1,4 +1,7 @@
 <?php
+    // The variable $_SESSION["result"] is the value shown at the top of the calculator
+    // If the value of $_SESSION["result"] is null set it to 0, otherwise leave it as is
+    // This checks every time the page is reloaded as buttons are pressed
     session_start();
     if(isset($_SESSION["result"])) {
         $_SESSION["result"] = $_SESSION["result"];
@@ -43,6 +46,12 @@
 
     <body>
         <?php
+            // Checks to see which button is pressed
+            if(isset($_POST["clear"])) {
+                $_SESSION["result"] = 0;
+            }
+
+            // If the current value is 0 replace the 0 with the next input
             if($_SESSION["result"] == 0) {
                 if(isset($_POST["1"])) {
                     $_SESSION["result"] = 1;
@@ -62,7 +71,17 @@
                     $_SESSION["result"] = 8;
                 } else if(isset($_POST["9"])) {
                     $_SESSION["result"] = 9;
+                } else if(isset($_POST["+"])) {
+                    $_SESSION["result"] = $_SESSION["result"] .= "+";
+                } else if(isset($_POST["-"])) {
+                    $_SESSION["result"] = $_SESSION["result"] .= "-";
+                } else if(isset($_POST["*"])) {
+                    $_SESSION["result"] = $_SESSION["result"] .= "*";
+                } else if(isset($_POST["/"])) {
+                    $_SESSION["result"] = $_SESSION["result"] .=  "/";
                 }
+
+            // Otherwise, place the new input next to the current string
             } else {
                 if(isset($_POST["1"])) {
                     $_SESSION["result"] .= 1;
@@ -82,20 +101,19 @@
                     $_SESSION["result"] .= 8;
                 } else if(isset($_POST["9"])) {
                     $_SESSION["result"] .= 9;
+                } else if(isset($_POST["+"])) {
+                    $_SESSION["result"] = $_SESSION["result"] .= "+";
+                } else if(isset($_POST["-"])) {
+                    $_SESSION["result"] = $_SESSION["result"] .= "-";
+                } else if(isset($_POST["*"])) {
+                    $_SESSION["result"] = $_SESSION["result"] .= "*";
+                } else if(isset($_POST["/"])) {
+                    $_SESSION["result"] = $_SESSION["result"] .=  "/";
                 }
             }
-
-            if(isset($_POST["+"])) {
-                $_SESSION["result"] = $_SESSION["result"] .= "+";
-            } else if(isset($_POST["-"])) {
-                $_SESSION["result"] = $_SESSION["result"] .= "-";
-            } else if(isset($_POST["*"])) {
-                $_SESSION["result"] = $_SESSION["result"] .= "*";
-            } else if(isset($_POST["/"])) {
-                $_SESSION["result"] = $_SESSION["result"] .=  "/";
-            } else if(isset($_POST["clear"])) {
-                $_SESSION["result"] = 0;
-            } else if(isset($_POST["="])) {
+            
+            // If button pressed is equal
+            if(isset($_POST["="])) {
                 $array = str_split($_SESSION["result"]);
 
                 for($i = 0; $i < strlen($_SESSION["result"]); $i++) {
@@ -103,21 +121,15 @@
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i, strlen($_SESSION["result"]));
                         $_SESSION["result"] = intval($first_half) + intval($second_half);
-                    }
-
-                    if($array[$i] == "-") {
+                    } else if($array[$i] == "-") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i, strlen($_SESSION["result"]));
                         $_SESSION["result"] = intval($first_half) - intval($second_half);
-                    }
-
-                    if($array[$i] == "*") {
+                    } else if($array[$i] == "*") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i, strlen($_SESSION["result"]));
                         $_SESSION["result"] = intval($first_half) * intval($second_half);
-                    }
-
-                    if($array[$i] == "/") {
+                    } else if($array[$i] == "/") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i, strlen($_SESSION["result"]));
                         $_SESSION["result"] = intval($first_half) / intval($second_half);
@@ -127,6 +139,8 @@
         ?>
 
         <center>
+            <!-- Each time any button is pressed, the form is submitted with the value 
+            of the given button being reloaded into this page as it refreshes -->
             <form action="calculate.php" method="post">
                 <table>
                     <tr>
