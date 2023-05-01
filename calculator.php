@@ -524,7 +524,7 @@
 
                     <tr>
                         <td><button type="submit" name="inverse" id="inverse">1/x</button></td>
-                        <td><button type="submit" name="clear" id="clear">C</button></td>
+                        <td><button type="submit" name="clear" id="clear">Clear</button></td>
                         <td><button type="submit" name="0" id="0">0</button></td>
                         <td><button type="submit" name="back" id="back"><-</button></td>
                         <td><button type="submit" name="=" id="=">=</button></td>
