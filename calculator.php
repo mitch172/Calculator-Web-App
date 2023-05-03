@@ -65,9 +65,47 @@
                 color:black;
             }
         </style>
+
+        <script>
+            function changeBGcolor() {
+                BGcolor = document.getElementById("BGcolor").value;
+                document.body.style.backgroundColor = BGcolor;
+                localStorage.setItem("BG", BGcolor);
+            }
+
+            function changeBTNcolor() {
+                BTNcolor = document.getElementById("BTNcolor").value;
+                Array.from(document.querySelectorAll('button')).map(function(button) {
+                    button.style.backgroundColor = BTNcolor;
+                })
+                localStorage.setItem("buttonBG",BTNcolor);
+            }
+
+            function changeTXTcolor() {
+                TXTcolor = document.getElementById("TXTcolor").value;
+                Array.from(document.querySelectorAll('button')).map(function(button) {
+                    button.style.color = TXTcolor;
+                })
+                localStorage.setItem("TXT", TXTcolor);
+            }
+
+            function loadColors() {
+                document.body.style.backgroundColor = localStorage.getItem("BG")
+
+                Array.from(document.querySelectorAll('button')).map(function(button) {
+                    button.style.backgroundColor = localStorage.getItem("buttonBG");
+                })
+
+                Array.from(document.querySelectorAll('button')).map(function(button) {
+                    button.style.color = localStorage.getItem("TXT");
+                })
+            }
+
+        </script>
+
     </head>
 
-    <body>
+    <body onload="loadColors()">
         <?php
             if(isset($_POST["clear"])) {
                 $_SESSION["result"] = "Cleared";
@@ -477,7 +515,7 @@
             <!-- Each time any button is pressed, the form is submitted with the value 
             of the given button being reloaded into this page as it refreshes -->
             <form action="calculator.php" method="post">
-                <table>
+                <table style = "height:100%">
                     <tr>
                         <td colspan="6" class="label">
                             <?php
@@ -532,14 +570,20 @@
                     </tr>
 
                     <tr>
-                        <td colspan="2"><button style="width:3in;" type="submit" name="convDecToBin" id="convDecToBin">Convert Decimal To Binary</button></td>
-                        <td colspan="2"><button style="width:3in;" type="submit" name="convBinToDec" id="convBinToDec">Convert Binary To Decimal</button></td>
-                        <td colspan="2"><button style="width:3in;" type="submit" name="convBinToHex" id="convBinToHex">Convert Binary To Hexadecimal</button></td>
+                        <td colspan="2"><button style="width:100%" type="submit" name="convDecToBin" id="convDecToBin">Convert Decimal To Binary</button></td>
+                        <td colspan="2"><button style="width:100%" type="submit" name="convBinToDec" id="convBinToDec">Convert Binary To Decimal</button></td>
+                        <td colspan="2"><button style="width:100%" type="submit" name="convBinToHex" id="convBinToHex">Convert Binary To Hexadecimal</button></td>
                     </tr>
 
                     <tr>
                         <td colspan="5" class="label"><a href="history.php" target="_blank">history</a></td>
                         <td><button type="submit" name="neg" id="neg">+/-</button></td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2"><button type="button" style="width:100%" onclick="changeBGcolor()">BG Color <input type="color" value="#F5F5DC" id='BGcolor'></button></td>
+                        <td colspan="2"><button type="button" style="width:100%" onclick="changeBTNcolor()">Button Color <input type="color" value="#bfbfbf" id='BTNcolor'></button></td>
+                        <td colspan="2"><button type="button" style="width:100%" onclick="changeTXTcolor()">Text Color <input type="color" value="#000000" id='TXTcolor'></button></td>
                     </tr>
                 </table>
             </form>
