@@ -89,7 +89,11 @@
                 Array.from(document.querySelectorAll('button')).map(function(button) {
                     button.style.color = TXTcolor;
                 })
+                Array.from(document.querySelectorAll('a')).map(function(button) {
+                    button.style.color = TXTcolor;
+                })
                 localStorage.setItem("TXT", TXTcolor);
+
             }
 
             function loadColors() {
