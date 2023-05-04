@@ -19,7 +19,10 @@
     }
 
     //String of hexadecimal valus
-    $hexValues = "0123456789abcdef";
+    $hexValuesStr = "0123456789ABCDEF";
+    //Array of Hex values
+    $hexValues = array('0'=>"0",'1'=>"1",'2'=>"2",'3'=>"3",'4'=>"4",'5'=>"5",'6'=>"6", 
+    '7'=>"7",'8'=>"8",'9'=>"9",'10'=>"A",'11'=>"B",'12'=>"C",'13'=>"D",'14'=>"E",'15'=>"F");
     //Binary values
     $hexBinValues= array('0'=>"0000",'1'=>"0001",'2'=>"0010",'3'=>"0011",'4'=>"0100",'5'=>"0101",'6'=>"0110", 
         '7'=>"0111",'8'=>"1000",'9'=>"1001",'A'=>"1010",'B'=>"1011",'C'=>"1100",'D'=>"1101",'E'=>"1110",'F'=>"1111");
@@ -241,176 +244,214 @@
                 } else if(isset($_POST["neg"])) {
                     $_SESSION["result"] = -1 * $_SESSION["result"];
                 }
+            }
 
-                else if(isset($_POST["convBinToDec"])) 
+
+            //If conversion buttons are pressed
+            if(isset($_POST["convBinToDec"])) 
+            {
+                $resultStr= $_SESSION["result"];   //Temp val for result, $_SESSION[result][x] was throwing an error
+                //Checks for proper input, binary
+                if(preg_match("|[0-1].*|",$resultStr))
                 {
-                    $resultStr= $_SESSION["result"];   //Temp val for result, $_SESSION[result][x] was throwing an error
-                    //Checks for proper input, binary
-                    if(preg_match("|[1]+[0]|",$resultStr))
+                    if($_SESSION["result"]<2)
                     {
+                        $_SESSION["result"]=$_SESSION["result"];
+                    }
+                    else{
                         //Calculate Binary To Decimal
                         array_push($_SESSION["history"], $_SESSION["result"]);
                         $decFromBin=0;
-                        for($j=0; $j < strlen($_SESSION["result"]); $j++)
+                        for($j=0; $j < strlen($_SESSION["result"]); $j++)           //Loop through input and calculate each digit
                         {
-                            $pow = intval(strlen($_SESSION["result"])-1)-$j;        //calculate exponent 2^pow 
-                            $decFromBin += intval(strval($resultStr[$j]))*pow(2,$pow);
+                            $pow = intval(strlen($_SESSION["result"])-1)-$j;        //calculate exponent 2^x, x being digit of input for each number
+                            $decFromBin += intval(strval($resultStr[$j]))*pow(2,$pow);      //Takes each binary digit and multilies it by 2^
                         }
-                        $_SESSION["result"]=$decFromBin;
-                        $strResult= "In Decimal: ".$_SESSION["result"];
-                        array_push($_SESSION["history_results"],$strResult);
+                        $_SESSION["result"]=$decFromBin;                              //Set the result
                     }
-                    else  //Wrong input
-                    {
-                        $_SESSION["result"]= "Error: Non-binary number input";
-                    }
+                    $strResult= "In Decimal: ".$_SESSION["result"];               //String for result 
+                    array_push($_SESSION["history_results"],$strResult);           //Append to history
                 }
-                else if(isset($_POST["convBinToHex"]))
+                else  //Wrong input
                 {
-                    $resultStr= $_SESSION["result"];   //Temp val for result, $_SESSION[result][x] was throwing an error
-                    if(preg_match("|[1]+[0]|",$resultStr))
+                    $_SESSION["result"]= "Error: Non-binary number input";
+                }
+            }
+            else if(isset($_POST["convBinToHex"]))
+            {
+                if(preg_match("|[0-1].*|",$_SESSION["result"]))
+                {
+                    //Calculate Binary To Hexadecimal
+                    array_push($_SESSION["history"], $_SESSION["result"]);
+                    $resultStr="";
+                    if($_SESSION["result"] < 2)
                     {
-                        //Calculate Binary To Hexadecimal
-                        array_push($_SESSION["history"], $_SESSION["result"]);
-                        if(strlen($resultStr)==0)
+                        $resultStr=strval($_SESSION["result"]);
+                    }
+                    else{
+                        if(strlen(strval($_SESSION["result"]))==2)
                         {
-                            $_SESSION["result"]=0;
-                        }
-                        else if(strlen($resultStr)==1)
-                        {
-                            $temp="000".$resultStr;
+                            $temp="00".$_SESSION["result"];
                             $resultStr=$temp;
                         }
-                        else if(strlen($resultStr)==2)
+                        else if(strlen(strval($_SESSION["result"]))==3)
                         {
-                            $temp="00".$resultStr;
+                            $temp="0".$_SESSION["result"];
                             $resultStr=$temp;
                         }
-                        else if(strlen($resultStr)==3)
-                        {
-                            $temp="0".$resultStr;
-                            $resultStr=$temp;
+                        else{
+                            $resultStr=$_SESSION["result"];
                         }
+                        
                         $hexFromBin="";
-                        $bin=4;
-                        $count=0;
-                        $len=strlen($resultStr);
-                        //While not last digit, make substrings of bits
-                        while($count != $len)
+                        $decFromBin=0;
+                        for($j=0; $j < strlen($resultStr); $j++)           //Loop through input and calculate decimal number first
                         {
-                            $temp=substr($resultStr,$count,$count+4);
-                            $hexFromBin .= $binHexValues[$temp];
-                            $count+=4;
+                            $pow = intval(strlen($resultStr)-1)-$j;        //calculate exponent 2^x, x being digit of input for each number
+                            $decFromBin += intval(strval($resultStr[$j]))*pow(2,$pow);      //Takes each binary digit and multilies it by 2^
+                        }
+                        
+                        $divRemain=array();                     //Array for division remainders in calculating decimal
+                        while($decFromBin > 0)                 //While greater than 0, find remainder of division by 16 and continue dividing by 16
+                        {
+                            if($decFromBin < 1)                 //To help terminate, if less than 1 means no more remainders, so break
+                            {
+                                break;
+                            }
+                            array_push($divRemain,($decFromBin%16));
+                            $decFromBin=$decFromBin/16;
+                        }
+                        for($i=count($divRemain)-1;$i>=0;$i--)                   //Number in hex is remainders backwards
+                        {   
+                            $hexFromBin.= $hexValues[$divRemain[$i]];    //Finds correct hex representation based on remainder
                         }
                         $_SESSION["result"]=$hexFromBin;
-                        $strResult="In Hex: ".$_SESSION["result"];
-                        array_push($_SESSION["history_results"],$strResult);
                     }
-                    else  //Wrong input
-                    {
-                        $_SESSION["result"]= "Error: Non-binary number input";
-                    }
+                    $strResult="In Hex: ".$_SESSION["result"];
+                    array_push($_SESSION["history_results"],$strResult);
                 }
-                else if(isset($_POST["convDecToBin"]))
+                else  //Wrong input
                 {
-                    if(preg_match("|[0-9].*|",$_SESSION["result"]))
+                    $_SESSION["result"]= "Error: Non-binary number input";
+                }
+            }
+            else if(isset($_POST["convDecToBin"]))
+            {
+                if(preg_match("|[0-9].*|",$_SESSION["result"]))
+                {
+                    array_push($_SESSION["history"], $_SESSION["result"]);
+                    $binFromDec="";
+                    if($_SESSION["result"]<2)                       //If input is 0 or 1, return them. Else calculate binary
                     {
-                        array_push($_SESSION["history"], $_SESSION["result"]);
-                        $binFromDec="";
-                        while($_SESSION["result"] > 0)
+                        $_SESSION["result"]=$_SESSION["result"];
+                    }
+                    else{
+                        while($_SESSION["result"] > 0)                      //While input greater than 2, find remainder of it divided by 2 and then divide number by 2
                         {
                             $binFromDec.=strval($_SESSION["result"]%2);
                             $_SESSION["result"]=$_SESSION["result"]/2;
-                            if($_SESSION["result"] < 1)
+                            if($_SESSION["result"] < 1)                     //If statement to terminate when 0, some numbers it wasnt terminating
                             {
                                 $_SESSION["result"]=0;
                             }
                         }
-                        $binReverse="";
-                        for($i=strlen($binFromDec)-1;$i>=0;$i--)
+                        $binReverse="";                                     //Binary output is remainders in reverse order
+                        for($i=strlen($binFromDec)-1;$i>=0;$i--)            //Reverse remainder string for output
                         {
                             $binReverse.=$binFromDec[$i];
                         }
                         $_SESSION["result"]=$binReverse;
-                        $strResult="In Binary: ".$_SESSION["result"];
-                        array_push($_SESSION["history_results"], $strResult);
+                    }
+                    $strResult="In Binary: ".$_SESSION["result"];
+                    array_push($_SESSION["history_results"], $strResult);
+                }
+                else{
+                    $_SESSION["result"]="Error: Non-decimal number input";
+                }
+            } 
+            else if(isset($_POST["convDecToHex"]))
+            {
+                if(preg_match("|[0-9].*|",$_SESSION["result"]))
+                {
+                    array_push($_SESSION["history"], $_SESSION["result"]);
+                    $divRemain=array();
+                    $hexFromDec="";
+                    if($_SESSION["result"] < 10)                       //If input is less than 10, return them. Else calculate hex
+                    {
+                        $_SESSION["result"]=$_SESSION["result"];
                     }
                     else{
-                        $_SESSION["result"]="Error: Non-decimal number input";
-                    }
-                } 
-                else if(isset($_POST["convDecToHex"]))
-                {
-                    if(preg_match("|[0-9].*|",$_SESSION["result"]))
-                    {
-                        array_push($_SESSION["history"], $_SESSION["result"]);
-                        $divRemain=array();
-                        $hexFromDec="";
-                        while($_SESSION["result"] > 0)
+                        while($_SESSION["result"] > 0)                              //While greater than 0, find remainder of division by 16 and continue dividing by 16
                         {
-                            array_push($divRemain,($_SESSION["result"]%16));
-                            $_SESSION["result"]=$_SESSION["result"]/16;
                             if($_SESSION["result"] < 1)
                             {
-                                $_SESSION["result"]=0;
+                                break;
                             }
+                            array_push($divRemain,($_SESSION["result"]%16));
+                            $_SESSION["result"]=$_SESSION["result"]/16;
                         }
-                        for($i=count($divRemain)-1;$i>=0;$i--)
-                        {
-                            $hexFromDec.=strpos($hexValues,$divRemain[$i]);
+                        for($i=count($divRemain)-1;$i>=0;$i--)                   //Number in hex is remainders backwards
+                        {   
+                            $hexFromDec.= $hexValues[$divRemain[$i]];    //Finds correct hex representation based on remainder
                         }
                         $_SESSION["result"]=$hexFromDec;
-                        $strResult="In Hex: ".$_SESSION["result"];
-                        array_push($_SESSION["history_results"],$strResult);
+                    }
+                    $strResult="In Hex: ".$_SESSION["result"];
+                    array_push($_SESSION["history_results"],$strResult);
+                }
+                else{
+                    $_SESSION["result"]="Error: Non-decimal number input";
+                }
+            }
+            else if(isset($_POST["convHexToDec"])) 
+            {
+                $resultStr= $_SESSION["result"];   //Temp val for result, $_SESSION[result][x] was throwing an error
+                if(preg_match("|[A-Z0-9].*|",$resultStr))
+                {
+                    array_push($_SESSION["history"], $_SESSION["result"]);
+                    if($_SESSION["result"]<10)                       //If input is 0 or 1, return them. Else calculate hex
+                    {
+                        $_SESSION["result"]=$_SESSION["result"];
                     }
                     else{
-                        $_SESSION["result"]="Error: Non-decimal number input";
-                    }
-                }
-                else if(isset($_POST["convHexToDec"])) 
-                {
-                    $resultStr= $_SESSION["result"];   //Temp val for result, $_SESSION[result][x] was throwing an error
-                    if(preg_match("|[A-Z].*|",$resultStr))
-                    {
-                        array_push($_SESSION["history"], $_SESSION["result"]);
                         $decFromHex=0;
-                        for($i=0; $i < strlen($_SESSION["result"]); $i++)
+                        for($i=0; $i < strlen($resultStr); $i++)
                         {
-                            $pow = intval(strlen($_SESSION["result"])-1)-$i;        //calculate exponent 2^pow 
-                            $decFromHex += strpos($hexValues,$resultStr[$i])*pow(16,$pow);
+                            $pow = intval(strlen($resultStr)-1)-$i;        //calculate exponent 2^pow 
+                            $decFromHex += strpos($hexValuesStr,$resultStr[$i])*pow(16,$pow);
                         }
                         $_SESSION["result"]=$decFromHex;
-                        $strResult="In Decimal: ".$_SESSION["result"];
-                        array_push($_SESSION["history_results"],$strResult);
                     }
-                    else  //Wrong input
-                    {
-                        $_SESSION["result"]= "Error: Non-hexadecimal input";
-                    }
-                                
+                    $strResult="In Decimal: ".$_SESSION["result"];
+                    array_push($_SESSION["history_results"],$strResult);
                 }
-                else if(isset($_POST["convHexToBin"]))
+                else  //Wrong input
                 {
-                    $resultStr= $_SESSION["result"];   //Temp val for result, $_SESSION[result][x] was throwing an error
-                    if(preg_match("|[a-zA-Z].*|",$resultStr))
-                    {
-                        array_push($_SESSION["history"], $_SESSION["result"]);
-                        $binFromHex="";
-                        for($i=0; $i < strlen($_SESSION["result"]); $i++)
-                        {
-                            $binFromHex .= $hexBinValues[$resultStr[$i]];
-                        }
-                        $_SESSION["result"]=$binFromHex;
-                        $strResult="In Binary: ". $_SESSION["result"];
-                        array_push($_SESSION["history_results"],$strResult);
-                    }
-                    else  //Wrong input
-                    {
-                        $_SESSION["result"]= "Error: Non-hexadecimal input";
-                    }
+                    $_SESSION["result"]= "Error: Non-hexadecimal input";
                 }
-
+                            
             }
+            else if(isset($_POST["convHexToBin"]))
+            {
+                $resultStr= $_SESSION["result"];   //Temp val for result, $_SESSION[result][x] was throwing an error
+                if(preg_match("|[a-zA-Z].*|",$resultStr))
+                {
+                    array_push($_SESSION["history"], $_SESSION["result"]);
+                    $binFromHex="";
+                    for($i=0; $i < strlen($_SESSION["result"]); $i++)
+                    {
+                        $binFromHex .= $hexBinValues[$resultStr[$i]];
+                    }
+                    $_SESSION["result"]=$binFromHex;
+                    $strResult="In Binary: ". $_SESSION["result"];
+                    array_push($_SESSION["history_results"],$strResult);
+                }
+                else  //Wrong input
+                {
+                    $_SESSION["result"]= "Error: Non-hexadecimal input";
+                }
+            }
+
             
             // If button pressed is "="
             if(isset($_POST["="])) {
@@ -573,6 +614,12 @@
                         <td colspan="2"><button style="width:100%" type="submit" name="convDecToBin" id="convDecToBin">Convert Decimal To Binary</button></td>
                         <td colspan="2"><button style="width:100%" type="submit" name="convBinToDec" id="convBinToDec">Convert Binary To Decimal</button></td>
                         <td colspan="2"><button style="width:100%" type="submit" name="convBinToHex" id="convBinToHex">Convert Binary To Hexadecimal</button></td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2"><button style="width:100%;" type="submit" name="convHexToBin" id="convHexToBin">Convert Hexadecimal To Binary</button></td>
+                        <td colspan="2"><button style="width:100%;" type="submit" name="convHexToDec" id="convHexToDec">Convert Hexadecimal To Decimal</button></td>
+                        <td colspan="2"><button style="width:100%;" type="submit" name="convDecToHex" id="convDecToHex">Convert Decimal To Hexadecimal</button></td>
                     </tr>
 
                     <tr>
