@@ -623,7 +623,7 @@
                     </tr>
 
                     <tr>
-                        <td colspan="5" class="label"><a href="history.php" target="_blank">history</a></td>
+                        <td colspan="5" class="label"><button style="width:100%"><a href="history.php" target="_blank">history</a></button></td>
                         <td><button type="submit" name="neg" id="neg">+/-</button></td>
                     </tr>
 
