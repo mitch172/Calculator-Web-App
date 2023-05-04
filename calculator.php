@@ -40,7 +40,7 @@
             }
 
             table {
-                width:50%;
+                width:80%;
                 font-size:50px;
             }
 
@@ -470,6 +470,8 @@
                         } else {
                             $_SESSION["result"] = "Error: no second value";
                         }
+
+                        break;
                     } else if($array[$i] == "-" && $array[0] != "-") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
@@ -494,6 +496,8 @@
                         } else {
                             $_SESSION["result"] = "Error: no second value";
                         }
+
+                        break;
                     } else if($array[$i] == "/") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
@@ -504,6 +508,8 @@
                         } else {
                             $_SESSION["result"] = $first_half / $second_half;
                         }
+
+                        break;
                     } else if($array[$i] == "^") {
                         $first_half = substr($_SESSION["result"], 0, $i);
                         $second_half = substr($_SESSION["result"], $i + 1, strlen($_SESSION["result"]));
@@ -558,7 +564,7 @@
             <form action="calculator.php" method="post">
                 <table style = "height:100%">
                     <tr>
-                        <td colspan="6" class="label">
+                        <td colspan="7" class="label">
                             <?php
                                 echo $_SESSION["result"];
                             ?>
@@ -572,6 +578,7 @@
                         <td><button type="submit" name="9" id="9">9</button></td>
                         <td><button type="submit" name="sin" id="sin">sin</button></td>
                         <td><button type="submit" name="*" id="*">*</button></td>
+                        <td><button type="submit" name="A" id="A">A</button></td>
                     </tr>
                     
                     <tr>
@@ -581,6 +588,7 @@
                         <td><button type="submit" name="6" id="6">6</button></td>
                         <td><button type="submit" name="cos" id="cos">cos</button></td>
                         <td><button type="submit" name="-" id="-">-</button></td>
+                        <td><button type="submit" name="B" id="B">B</button></td>
                     </tr>
 
                     <tr>
@@ -590,6 +598,7 @@
                         <td><button type="submit" name="3" id="3">3</button></td>
                         <td><button type="submit" name="tan" id="tan">tan</button></td>
                         <td><button type="submit" name="+" id="+">+</button></td>
+                        <td><button type="submit" name="C" id="A">C</button></td>
                     </tr>
 
                     <tr>
@@ -599,37 +608,33 @@
                         <td><button type="submit" name="back" id="back"><-</button></td>
                         <td><button type="submit" name="=" id="=">=</button></td>
                         <td><button type="submit" name="/" id="/">/</button></td>
-                    </tr>
-
-                    <tr>
-                        <td><button type="submit" name="A" id="A">A</button></td>
-                        <td><button type="submit" name="B" id="B">B</button></td>
-                        <td><button type="submit" name="C" id="A">C</button></td>
                         <td><button type="submit" name="D" id="A">D</button></td>
-                        <td><button type="submit" name="E" id="A">E</button></td>
-                        <td><button type="submit" name="F" id="A">F</button></td>
+                        
+                        
                     </tr>
 
                     <tr>
                         <td colspan="2"><button style="width:100%" type="submit" name="convDecToBin" id="convDecToBin">Convert Decimal To Binary</button></td>
                         <td colspan="2"><button style="width:100%" type="submit" name="convBinToDec" id="convBinToDec">Convert Binary To Decimal</button></td>
                         <td colspan="2"><button style="width:100%" type="submit" name="convBinToHex" id="convBinToHex">Convert Binary To Hexadecimal</button></td>
+                        <td><button type="submit" name="E" id="A">E</button></td>
                     </tr>
 
                     <tr>
                         <td colspan="2"><button style="width:100%;" type="submit" name="convHexToBin" id="convHexToBin">Convert Hexadecimal To Binary</button></td>
                         <td colspan="2"><button style="width:100%;" type="submit" name="convHexToDec" id="convHexToDec">Convert Hexadecimal To Decimal</button></td>
                         <td colspan="2"><button style="width:100%;" type="submit" name="convDecToHex" id="convDecToHex">Convert Decimal To Hexadecimal</button></td>
+                        <td><button type="submit" name="F" id="A">F</button></td>
                     </tr>
 
                     <tr>
-                        <td colspan="5" class="label"><button style="width:100%"><a href="history.php" target="_blank">history</a></button></td>
+                        <td colspan="6" class="label"><button style="width:100%"><a href="history.php" target="_blank">history</a></button></td>
                         <td><button type="submit" name="neg" id="neg">+/-</button></td>
                     </tr>
 
                     <tr>
                         <td colspan="2"><button type="button" style="width:100%" onclick="changeBGcolor()">BG Color <input type="color" value="#F5F5DC" id='BGcolor'></button></td>
-                        <td colspan="2"><button type="button" style="width:100%" onclick="changeBTNcolor()">Button Color <input type="color" value="#bfbfbf" id='BTNcolor'></button></td>
+                        <td colspan="3"><button type="button" style="width:100%" onclick="changeBTNcolor()">Button Color <input type="color" value="#bfbfbf" id='BTNcolor'></button></td>
                         <td colspan="2"><button type="button" style="width:100%" onclick="changeTXTcolor()">Text Color <input type="color" value="#000000" id='TXTcolor'></button></td>
                     </tr>
                 </table>
