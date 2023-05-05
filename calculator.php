@@ -1,12 +1,12 @@
 <?php
     // The variable $_SESSION["result"] is the value shown at the top of the calculator
-    // If the value of $_SESSION["result"] is null set it to 0, otherwise leave it as is
+    // If the value of $_SESSION["result"] is null set it to clear, otherwise leave it as is
     // This checks every time the page is reloaded as buttons are pressed
     session_start();
     if(isset($_SESSION["result"])) {
         $_SESSION["result"] = $_SESSION["result"];
     } else {
-        $_SESSION["result"] = 0;
+        $_SESSION["result"] = "Cleared";
     }
     
     // Array used for storing history of calculations
@@ -40,7 +40,8 @@
             }
 
             table {
-                width:80%;
+                table-layout:fixed;
+                width:70%;
                 font-size:50px;
             }
 
@@ -234,9 +235,15 @@
                 } else if(isset($_POST["dec"])) {
                     $_SESSION["result"] = $_SESSION["result"] .=  ".";
                 } else if(isset($_POST["inverse"])) {
-                    array_push($_SESSION["history"], $_SESSION["result"]);
-                    $_SESSION["result"] = 1 / $_SESSION["result"];
-                    array_push($_SESSION["history_results"], $_SESSION["result"]);
+                    if(preg_match("|[0]|",$_SESSION["result"]) || preg_match("|[0-1]|",$_SESSION["result"])  || preg_match("|[A-Z].*|",$_SESSION["result"]))
+                    {
+                        $_SESSION["result"]= "Error: Divide by zero or non-base-10 input";
+                    }
+                    else{
+                        array_push($_SESSION["history"], $_SESSION["result"]);
+                        $_SESSION["result"] = 1 / $_SESSION["result"];
+                        array_push($_SESSION["history_results"], $_SESSION["result"]);
+                    }
                 } else if(isset($_POST["sin"])) {
                     $_SESSION["result"] = "sin(" . $_SESSION["result"];
                 } else if(isset($_POST["cos"])) {
@@ -246,7 +253,14 @@
                 } else if(isset($_POST["sqrt"])) {
                     $_SESSION["result"] = "sqrt(" . $_SESSION["result"];
                 } else if(isset($_POST["neg"])) {
-                    $_SESSION["result"] = -1 * $_SESSION["result"];
+                    if((preg_match("|[0-1]|",$_SESSION["result"]) || preg_match("|[A-Z0-9].*|",$_SESSION["result"])) && strlen(strval($_SESSION["result"]))>0)
+                    {
+                        $temp=$_SESSION["result"];
+                        $_SESSION["result"]= "-".$temp;
+                    }
+                    else{
+                        $_SESSION["result"] = -1 * $_SESSION["result"];   
+                    }
                 }
             }
 
@@ -254,27 +268,60 @@
             //If conversion buttons are pressed
             if(isset($_POST["convBinToDec"])) 
             {
-                $resultStr= $_SESSION["result"];   //Temp val for result, $_SESSION[result][x] was throwing an error
-                //Checks for proper input, binary
-                if(preg_match("|[0-1].*|",$resultStr))
+                $resultStr= strval($_SESSION["result"]);   //Temp val for result, $_SESSION[result][x] was throwing an error
+                $isNeg=FALSE;                               //Boolean for negative value in conversions
+                if($resultStr[0]=="-")  //Check if negative
                 {
-                    if($_SESSION["result"]<2)
+                    $isNeg=TRUE;
+                    $tempResult=substr($resultStr,1,strlen($resultStr));
+                    $resultStr=$tempResult;
+                }
+
+                //Checks for proper input, binary
+                if(preg_match("|[0-1]|",$resultStr))
+                {
+                    if(intval($resultStr)<2)
                     {
-                        $_SESSION["result"]=$_SESSION["result"];
+                        array_push($_SESSION["history"],$resultStr);           //Append to history
+                        $_SESSION["result"]=$resultStr;
+                        $strResult= "In Decimal:  ".$resultStr;
+                        array_push($_SESSION["history_results"],$strResult);           //Append to history
                     }
                     else{
-                        //Calculate Binary To Decimal
-                        array_push($_SESSION["history"], $_SESSION["result"]);
-                        $decFromBin=0;
-                        for($j=0; $j < strlen($_SESSION["result"]); $j++)           //Loop through input and calculate each digit
+                        //Check length for 4 proper bits
+                        if(strlen($resultStr)==2)
                         {
-                            $pow = intval(strlen($_SESSION["result"])-1)-$j;        //calculate exponent 2^x, x being digit of input for each number
+                            $temp="00".$resultStr;
+                            $resultStr=$temp;
+                        }
+                        else if(strlen($resultStr)==3)
+                        {
+                            $temp="0".$resultStr;
+                            $resultStr=$temp;
+                        }
+                        
+                        //Calculate Binary To Decimal
+                        $decFromBin=0;
+                        for($j=0; $j < strlen($resultStr); $j++)           //Loop through input and calculate each digit
+                        {
+                            $pow = intval(strlen($resultStr)-1)-$j;        //calculate exponent 2^x, x being digit of input for each number
                             $decFromBin += intval(strval($resultStr[$j]))*pow(2,$pow);      //Takes each binary digit and multilies it by 2^
                         }
-                        $_SESSION["result"]=$decFromBin;                              //Set the result
+                        if($isNeg)
+                        {
+                            $_SESSION["result"]=-1*$decFromBin;                              //Set the result
+                            $strResult= "In Decimal: ".$_SESSION["result"];               //String for result 
+                            array_push($_SESSION["history"], "-".$resultStr);
+                            array_push($_SESSION["history_results"],$strResult);           //Append to history
+                            $isNeg=FALSE;                                                  //Reset negative bool
+                        }
+                        else{
+                            $_SESSION["result"]=$decFromBin;                              //Set the result
+                            $strResult= "In Decimal: ".$_SESSION["result"];               //String for result
+                            array_push($_SESSION["history"], $resultStr); 
+                            array_push($_SESSION["history_results"],$strResult);           //Append to history
+                        }
                     }
-                    $strResult= "In Decimal: ".$_SESSION["result"];               //String for result 
-                    array_push($_SESSION["history_results"],$strResult);           //Append to history
                 }
                 else  //Wrong input
                 {
@@ -283,28 +330,35 @@
             }
             else if(isset($_POST["convBinToHex"]))
             {
-                if(preg_match("|[0-1].*|",$_SESSION["result"]))
+                $resultStr= strval($_SESSION["result"]);   //Temp val for result, $_SESSION[result][x] was throwing an error
+                $isNeg=FALSE;                               //Boolean for negative value in conversions
+                if($resultStr[0]=="-")  //Check if negative
+                {
+                    $isNeg=TRUE;
+                    $tempResult=substr($resultStr,1,strlen($resultStr));
+                    $resultStr=$tempResult;
+                }
+
+                if(preg_match("|[0-1]|",$resultStr))
                 {
                     //Calculate Binary To Hexadecimal
-                    array_push($_SESSION["history"], $_SESSION["result"]);
-                    $resultStr="";
-                    if($_SESSION["result"] < 2)
+                    if(intval($resultStr) < 2)                     //Binary numbers of 0 or 1 are the same in Hex and Dec 
                     {
-                        $resultStr=strval($_SESSION["result"]);
+                        $_SESSION["result"]=$resultStr;
+                        array_push($_SESSION["history"],$_SESSION["result"]); 
+                        $strResult= "In Decimal:  ".$_SESSION["result"];
+                        array_push($_SESSION["history_results"],$strResult); 
                     }
                     else{
-                        if(strlen(strval($_SESSION["result"]))==2)
+                        if(strlen($resultStr)==2)
                         {
                             $temp="00".$_SESSION["result"];
                             $resultStr=$temp;
                         }
-                        else if(strlen(strval($_SESSION["result"]))==3)
+                        else if(strlen($resultStr)==3)
                         {
                             $temp="0".$_SESSION["result"];
                             $resultStr=$temp;
-                        }
-                        else{
-                            $resultStr=$_SESSION["result"];
                         }
                         
                         $hexFromBin="";
@@ -329,10 +383,21 @@
                         {   
                             $hexFromBin.= $hexValues[$divRemain[$i]];    //Finds correct hex representation based on remainder
                         }
-                        $_SESSION["result"]=$hexFromBin;
+                        if($isNeg)
+                        {
+                            $_SESSION["result"]="-".$hexFromBin;                              //Set the result
+                            $strResult= "In Hex: ".$_SESSION["result"];               //String for result 
+                            array_push($_SESSION["history"], "-".$resultStr);
+                            array_push($_SESSION["history_results"],$strResult);           //Append to history
+                            $isNeg=FALSE;                                                  //Reset negative bool
+                        }
+                        else{
+                            $_SESSION["result"]=$hexFromBin;                              //Set the result
+                            $strResult= "In Hex: ".$_SESSION["result"];               //String for result
+                            array_push($_SESSION["history"], $resultStr); 
+                            array_push($_SESSION["history_results"],$strResult);           //Append to history
+                        }
                     }
-                    $strResult="In Hex: ".$_SESSION["result"];
-                    array_push($_SESSION["history_results"],$strResult);
                 }
                 else  //Wrong input
                 {
@@ -341,22 +406,33 @@
             }
             else if(isset($_POST["convDecToBin"]))
             {
-                if(preg_match("|[0-9].*|",$_SESSION["result"]))
+                $resultStr=strval($_SESSION["result"]);
+                $isNeg=FALSE;
+                if(strval($resultStr[0])=="-")  //Check if negative
+                {
+                    $isNeg=TRUE;
+                    $resultStr=intval(substr($resultStr,1,strlen($resultStr)));
+                }
+                if(preg_match("|[0-9]|",$resultStr))
                 {
                     array_push($_SESSION["history"], $_SESSION["result"]);
                     $binFromDec="";
-                    if($_SESSION["result"]<2)                       //If input is 0 or 1, return them. Else calculate binary
+                    if($resultStr<2)                       //If input is 0 or 1, return them. Else calculate binary
                     {
-                        $_SESSION["result"]=$_SESSION["result"];
+                        if($isNeg){
+                            $_SESSION["result"]="-".$resultStr;}
+                        else{
+                            $_SESSION["result"]=$resultStr;
+                        }
                     }
                     else{
-                        while($_SESSION["result"] > 0)                      //While input greater than 2, find remainder of it divided by 2 and then divide number by 2
+                        while($resultStr > 0)                      //While input greater than 2, find remainder of it divided by 2 and then divide number by 2
                         {
-                            $binFromDec.=strval($_SESSION["result"]%2);
-                            $_SESSION["result"]=$_SESSION["result"]/2;
-                            if($_SESSION["result"] < 1)                     //If statement to terminate when 0, some numbers it wasnt terminating
+                            $binFromDec.=strval($resultStr%2);
+                            $resultStr=$resultStr/2;
+                            if($resultStr < 1)                     //If statement to terminate when 0, some numbers it wasnt terminating
                             {
-                                $_SESSION["result"]=0;
+                                break;
                             }
                         }
                         $binReverse="";                                     //Binary output is remainders in reverse order
@@ -364,9 +440,16 @@
                         {
                             $binReverse.=$binFromDec[$i];
                         }
-                        $_SESSION["result"]=$binReverse;
                     }
-                    $strResult="In Binary: ".$_SESSION["result"];
+                    if($isNeg)
+                    {
+                        $_SESSION["result"]="-".$binReverse;
+                        $strResult="In Binary: ".$_SESSION["result"];
+                        $isNeg=FALSE;
+                    }
+                    else{
+                        $strResult="In Binary: ".$_SESSION["result"];
+                    }
                     array_push($_SESSION["history_results"], $strResult);
                 }
                 else{
@@ -375,32 +458,50 @@
             } 
             else if(isset($_POST["convDecToHex"]))
             {
-                if(preg_match("|[0-9].*|",$_SESSION["result"]))
+                $resultStr=strval($_SESSION["result"]);
+                $isNeg=FALSE;
+                if(strval($resultStr[0])=="-")  //Check if negative
+                {
+                    $isNeg=TRUE;
+                    $resultStr=intval(substr($resultStr,1,strlen($resultStr)));
+                }
+                if(preg_match("|[0-9]|",$resultStr))
                 {
                     array_push($_SESSION["history"], $_SESSION["result"]);
                     $divRemain=array();
                     $hexFromDec="";
-                    if($_SESSION["result"] < 10)                       //If input is less than 10, return them. Else calculate hex
+                    if($resultStr < 10)                       //If input is less than 10, return them. Else calculate hex
                     {
-                        $_SESSION["result"]=$_SESSION["result"];
+                        if($isNeg){
+                            $_SESSION["result"]="-".$resultStr;}
+                        else{
+                            $_SESSION["result"]=$resultStr;
+                        }
                     }
                     else{
-                        while($_SESSION["result"] > 0)                              //While greater than 0, find remainder of division by 16 and continue dividing by 16
+                        while($resultStr > 0)                              //While greater than 0, find remainder of division by 16 and continue dividing by 16
                         {
-                            if($_SESSION["result"] < 1)
+                            if($resultStr < 1)
                             {
                                 break;
                             }
-                            array_push($divRemain,($_SESSION["result"]%16));
-                            $_SESSION["result"]=$_SESSION["result"]/16;
+                            array_push($divRemain,($resultStr%16));
+                            $resultStr=$resultStr/16;
                         }
                         for($i=count($divRemain)-1;$i>=0;$i--)                   //Number in hex is remainders backwards
                         {   
                             $hexFromDec.= $hexValues[$divRemain[$i]];    //Finds correct hex representation based on remainder
                         }
-                        $_SESSION["result"]=$hexFromDec;
                     }
-                    $strResult="In Hex: ".$_SESSION["result"];
+                    if($isNeg)
+                    {
+                        $_SESSION["result"]="-".$hexFromDec;
+                        $strResult="In Hex: ".$_SESSION["result"];
+                        $isNeg=FALSE;
+                    }
+                    else{
+                        $strResult="In Hex: ".$_SESSION["result"];
+                    }
                     array_push($_SESSION["history_results"],$strResult);
                 }
                 else{
@@ -410,12 +511,22 @@
             else if(isset($_POST["convHexToDec"])) 
             {
                 $resultStr= $_SESSION["result"];   //Temp val for result, $_SESSION[result][x] was throwing an error
+                $isNeg=FALSE;
+                if(strval($resultStr[0])=="-")  //Check if negative
+                {
+                    $isNeg=TRUE;
+                    $resultStr=substr($resultStr,1,strlen($resultStr));
+                }
                 if(preg_match("|[A-Z0-9].*|",$resultStr))
                 {
                     array_push($_SESSION["history"], $_SESSION["result"]);
-                    if($_SESSION["result"]<10)                       //If input is 0 or 1, return them. Else calculate hex
+                    if($resultStr<2)                       //If input is 0 or 1, return them. Else calculate binary
                     {
-                        $_SESSION["result"]=$_SESSION["result"];
+                        if($isNeg){
+                            $_SESSION["result"]="-".$resultStr;}
+                        else{
+                            $_SESSION["result"]=$resultStr;
+                        }
                     }
                     else{
                         $decFromHex=0;
@@ -424,9 +535,17 @@
                             $pow = intval(strlen($resultStr)-1)-$i;        //calculate exponent 2^pow 
                             $decFromHex += strpos($hexValuesStr,$resultStr[$i])*pow(16,$pow);
                         }
-                        $_SESSION["result"]=$decFromHex;
                     }
-                    $strResult="In Decimal: ".$_SESSION["result"];
+                    if($isNeg)
+                    {
+                        $_SESSION["result"]=-1*$decFromHex;
+                        $strResult="In Decimal: ".$_SESSION["result"];
+                        $isNeg=FALSE;
+                    }
+                    else{
+                        $_SESSION["result"]=$decFromHex;
+                        $strResult="In Decimal: ".$_SESSION["result"];
+                    }
                     array_push($_SESSION["history_results"],$strResult);
                 }
                 else  //Wrong input
@@ -438,17 +557,31 @@
             else if(isset($_POST["convHexToBin"]))
             {
                 $resultStr= $_SESSION["result"];   //Temp val for result, $_SESSION[result][x] was throwing an error
-                if(preg_match("|[a-zA-Z].*|",$resultStr))
+                $isNeg=FALSE;
+                if(strval($resultStr[0])=="-")  //Check if negative
+                {
+                    $isNeg=TRUE;
+                    $resultStr=substr($resultStr,1,strlen($resultStr));
+                }
+                if(preg_match("|[A-Z0-9].*|",$resultStr))
                 {
                     array_push($_SESSION["history"], $_SESSION["result"]);
                     $binFromHex="";
-                    for($i=0; $i < strlen($_SESSION["result"]); $i++)
+                    for($i=0; $i < strlen($resultStr); $i++)
                     {
                         $binFromHex .= $hexBinValues[$resultStr[$i]];
                     }
-                    $_SESSION["result"]=$binFromHex;
-                    $strResult="In Binary: ". $_SESSION["result"];
-                    array_push($_SESSION["history_results"],$strResult);
+                    if($isNeg)
+                    {
+                        $_SESSION["result"]="-".$binFromHex;
+                        $strResult="In Binary: ".$_SESSION["result"];
+                        $isNeg=FALSE;
+                    }
+                    else{
+                        $_SESSION["result"]=$binFromHex;
+                        $strResult="In Binary: ".$_SESSION["result"];
+                    }
+                    array_push($_SESSION["history_results"], $strResult);
                 }
                 else  //Wrong input
                 {
@@ -459,6 +592,11 @@
             
             // If button pressed is "="
             if(isset($_POST["="])) {
+                if(preg_match("|[0-1]|",$_SESSION["result"])  || preg_match("|[A-Z].*|",$_SESSION["result"]))
+                {
+                    $_SESSION["result"]= "Error: Non-base-10 input";
+                }
+                else{
                 // Store current result value to history
                 array_push($_SESSION["history"], $_SESSION["result"]);
 
@@ -560,6 +698,7 @@
                 // After math is complete, push result into history results
                 array_push($_SESSION["history_results"], $_SESSION["result"]);
             }
+            }
         ?>
 
         <center>
@@ -602,7 +741,7 @@
                         <td><button type="submit" name="3" id="3">3</button></td>
                         <td><button type="submit" name="tan" id="tan">tan</button></td>
                         <td><button type="submit" name="+" id="+">+</button></td>
-                        <td><button type="submit" name="C" id="A">C</button></td>
+                        <td><button type="submit" name="C" id="C">C</button></td>
                     </tr>
 
                     <tr>
@@ -612,7 +751,7 @@
                         <td><button type="submit" name="back" id="back"><-</button></td>
                         <td><button type="submit" name="=" id="=">=</button></td>
                         <td><button type="submit" name="/" id="/">/</button></td>
-                        <td><button type="submit" name="D" id="A">D</button></td>
+                        <td><button type="submit" name="D" id="D">D</button></td>
                         
                         
                     </tr>
@@ -621,14 +760,14 @@
                         <td colspan="2"><button style="width:100%" type="submit" name="convDecToBin" id="convDecToBin">Convert Decimal To Binary</button></td>
                         <td colspan="2"><button style="width:100%" type="submit" name="convBinToDec" id="convBinToDec">Convert Binary To Decimal</button></td>
                         <td colspan="2"><button style="width:100%" type="submit" name="convBinToHex" id="convBinToHex">Convert Binary To Hexadecimal</button></td>
-                        <td><button type="submit" name="E" id="A">E</button></td>
+                        <td><button type="submit" name="E" id="E">E</button></td>
                     </tr>
 
                     <tr>
                         <td colspan="2"><button style="width:100%;" type="submit" name="convHexToBin" id="convHexToBin">Convert Hexadecimal To Binary</button></td>
                         <td colspan="2"><button style="width:100%;" type="submit" name="convHexToDec" id="convHexToDec">Convert Hexadecimal To Decimal</button></td>
                         <td colspan="2"><button style="width:100%;" type="submit" name="convDecToHex" id="convDecToHex">Convert Decimal To Hexadecimal</button></td>
-                        <td><button type="submit" name="F" id="A">F</button></td>
+                        <td><button type="submit" name="F" id="F">F</button></td>
                     </tr>
 
                     <tr>
