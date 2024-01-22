@@ -17,8 +17,8 @@ To use the Calculator Web App, follow these steps:
     git clone https://github.com/mitch172/Calculator-Web-App.git
     ```
 
-2. **Open `index.html`**: 
-    Open the `index.html` file in your web browser.
+2. **Open `calculator.php`**: 
+    Open the `calculator.php` file in your web browser.
 
 3. **Start Calculating**: 
     Perform calculations by clicking on the buttons or using your keyboard.
